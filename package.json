@@ -33,9 +33,15 @@
     "last 2 versions"
   ],
   "devDependencies": {
-    "@babel/core": "^7.6.2",
-    "@babel/preset-env": "^7.6.2",
+    "@babel/core": "^7.20.7",
+    "@babel/plugin-transform-runtime": "^7.19.6",
+    "@babel/preset-env": "^7.20.2",
     "@htmlacademy/editorconfig-cli": "^1.0.0",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-multi-entry": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-terser": "^0.2.1",
     "autoprefixer": "^10.2.4",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.0.6",
@@ -61,10 +67,8 @@
     "gulp-pug": "^4.0.1",
     "gulp-rename": "^2.0.0",
     "gulp-sass": "^5.1.0",
-    "gulp-sourcemaps": "^3.0.0",
     "gulp-svgmin": "^3.0.0",
     "gulp-svgstore": "^7.0.1",
-    "gulp-uglify-es": "^3.0.0",
     "husky": "^4.2.3",
     "jstransformer-markdown-it": "^2.0.0",
     "lint-staged": "^10.0.9",
@@ -84,13 +88,13 @@
     "stylelint-order": "^5.0.0",
     "stylelint-scss": "^4.3.0",
     "stylelint-selector-bem-pattern": "^2.1.0",
-    "through2": "^4.0.2",
-    "webpack": "^5.21.1",
-    "webpack-stream": "^7.0.0"
+    "through2": "^4.0.2"
   },
   "dependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
     "autosize": "^5.0.2",
     "imask": "^6.4.3",
+    "rollup": "^3.29.4",
     "sanitize.css": "^13.0.0"
   },
   "husky": {

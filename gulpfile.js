@@ -26,12 +26,17 @@ const pxToRem = require('postcss-pxtorem');
 const rename = require('gulp-rename');
 const replace = require('postcss-replace');
 const sass = require('gulp-sass')(require('sass'));
-const sourcemaps = require('gulp-sourcemaps');
 const svgMin = require('gulp-svgmin');
 const svgStore = require('gulp-svgstore');
 const through2 = require('through2');
-const uglify = require('gulp-uglify-es').default;
-const webpackStream = require('webpack-stream');
+
+const { rollup } = require('rollup');
+const resolve = require('@rollup/plugin-node-resolve');
+const rollupReplace = require('@rollup/plugin-replace');
+const babel = require('@rollup/plugin-babel');
+const multi = require('@rollup/plugin-multi-entry');
+const terser = require('@rollup/plugin-terser');
+const commonjs = require('@rollup/plugin-commonjs');
 
 // Глобальные настройки этого запуска
 const mode = process.env.MODE || 'development';
@@ -301,6 +306,7 @@ exports.compileSass = compileSass;
 
 function writeJsRequiresFile(cb) {
   const jsRequiresList = [];
+
   nth.config.addJsBefore.forEach(function(src) {
     jsRequiresList.push(src);
   });
@@ -310,7 +316,14 @@ function writeJsRequiresFile(cb) {
     jsRequiresList.push(`../blocks/${blockName}/${blockName}.js`)
   });
   allBlocksWithJsFiles.forEach(function(blockName){
-    let src = `../blocks/${blockName}/${blockName}.js`
+    let src = `../blocks/${blockName}/${blockName}.js`;
+    const prefix = (mode === 'development') ? 'dev' : '';
+    const devJS = fs.existsSync(`${__dirname}/${dir.blocks}/${blockName}/${prefix}.${blockName}.js`);
+
+    if (devJS === true && mode === 'development') {
+      src = `../blocks/${blockName}/${prefix}.${blockName}.js`;
+    }
+
     if (nth.blocksFromHtml.indexOf(blockName) === -1) return;
     if (jsRequiresList.indexOf(src) > -1) return;
     jsRequiresList.push(src);
@@ -332,47 +345,40 @@ exports.writeJsRequiresFile = writeJsRequiresFile;
 
 
 function compileJs() {
-  const entryList = {
-    'bundle': `./${dir.src}js/entry.js`,
+  const babelConfig = {
+    babelHelpers: 'runtime',
+    presets: [
+      '@babel/preset-env'
+    ],
+    plugins: ['@babel/plugin-transform-runtime'],
+    exclude: [
+      '**/node_modules/**',
+      './src/js/libs/**'
+    ]
   };
-  return src(`${dir.src}js/entry.js`)
-    .pipe(plumber())
-    .pipe(webpackStream({
-      mode: mode,
-      entry: entryList,
-      devtool: mode === 'development' ? 'inline-source-map' : false,
-      output: {
-        filename: '[name].js',
-      },
-      resolve: {
-        alias: {
-          Utils: path.resolve(__dirname, 'src/js/utils/'),
-        },
-      },
-      module: {
-        rules: [
-          {
-            test: /\.(js)$/,
-            exclude: /(node_modules)/,
-            loader: 'babel-loader',
-            options: {
-              presets: ['@babel/preset-env']
-            }
-          }
-        ]
-      },
-      // externals: {
-      //   jquery: 'jQuery'
-      // }
-    }))
-    .pipe(sourcemaps.init())
-    .pipe(uglify({
-      output: {
-        comments: false
-      }
-    }))
-    .pipe(sourcemaps.write("./"))
-    .pipe(dest(`${dir.build}${sources.js}`));
+
+  return rollup({
+    input: `${dir.src}js/entry.js`,
+    plugins: [
+      multi(),
+      resolve(),
+      rollupReplace({
+        values: {
+            'process.env.NODE_ENV': `"${mode}"`
+        }
+      }),
+      mode !== 'development' && terser(),
+      babel(babelConfig),
+      commonjs()
+    ]
+  })
+    .then(bundle => {
+      return bundle.write({
+        file: `${dir.build}${sources.js}/bundle.js`,
+        format: 'cjs',
+        sourcemap: (mode === 'development')
+      });
+    });
 }
 exports.compileJs = compileJs;
 
