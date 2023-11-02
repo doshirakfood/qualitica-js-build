@@ -1,0 +1,24 @@
+//- Все примеси в этом файле должны начинаться c имени блока (build-example)
+//- Упоминание имени блока в классах обязательно, без этого он не попадёт в сборку
+
+mixin build-example(mods, id)
+
+  //- Принимает:
+  //-   mods       {string} - список модификаторов
+  //-   id         {string} - атрибут id
+  //- Вызов:
+        +build-example('some-mod', 'some-id')
+
+  -
+    // список модификаторов
+    var allMods = '';
+    if(typeof(mods) !== 'undefined' && mods) {
+      var modsList = mods.split(',');
+      for (var i = 0; i < modsList.length; i++) {
+        allMods = allMods + ' build-example--' + modsList[i].trim();
+      }
+    }
+
+  div.build-example
+    +button('button', 'Нажми на меня', 'primary', 'button-name', 'exp-button').build-example__trigger
+    .build-example__notification

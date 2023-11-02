@@ -1,13 +1,3 @@
-// import ready from "../js/utils/documentReady.js";
-// import getScrollSize from "../js/utils/getScrollSize.js";
+let result = (process.env.NODE_ENV === "development") ? `Результат dev-версии: ${10 + 11}` : `Результат prod-версии: ${20 + 20}`;
 
-// ready(function () {
-//   console.log("DOM героически построен!");
-//   // Добавление кастомного свойства с системной шириной скролла
-//   document.documentElement.style.setProperty("--css-scroll-size", `${getScrollSize()}px`);
-// });
-
-// import $ from "jquery"; // Перед использованием установить как зависимость
-// $(function () {
-//   console.log("jQuery героически сработал!");
-// });
+console.log(result);

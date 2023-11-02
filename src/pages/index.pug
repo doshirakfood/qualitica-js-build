@@ -113,3 +113,10 @@ block content
                   img.library__img(src= src.img + 'img__gulp.jpg', alt='Gulp logo')
                 .library__tile.library__tile--img-bg
                   .library__tile-descr Картинка фоном
+      section.library__section
+        .library__anchor(id= library.section[3].href)
+        .library__inner
+          h2.library__title!= library.section[3].title
+          ul.library__list
+            li.library__item
+              +build-example
